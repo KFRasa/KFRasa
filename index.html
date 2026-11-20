@@ -39,7 +39,6 @@
       overflow-x: hidden;
     }
 
-    /* Two-tone split hairline at very top echoing the icon */
     body::before {
       content: "";
       position: relative;
@@ -218,28 +217,10 @@
       min-width: 0;
     }
 
-    .name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     .profile-meta h1 {
       font-size: 1.2rem;
       font-weight: 600;
       letter-spacing: -0.01em;
-    }
-
-    .gd-pill {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--cyan);
-      border: 1px solid rgba(0, 200, 255, 0.3);
-      background: rgba(0, 200, 255, 0.07);
-      padding: 2px 6px;
-      border-radius: 4px;
     }
 
     .profile-meta p {
@@ -251,10 +232,22 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       position: relative;
       z-index: 1;
       flex-shrink: 0;
+    }
+
+    .sub-badge {
+      display: none;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 8px 11px;
+      border-radius: 6px;
+      white-space: nowrap;
     }
 
     .yt-link {
@@ -272,40 +265,6 @@
     .yt-link:hover {
       opacity: 0.9;
       transform: translateY(-1px);
-    }
-
-    /* Optional GD Info Strip */
-    .info-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .info-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      background: var(--surface);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 6px;
-      transition: border-color 0.15s ease, color 0.15s ease;
-    }
-
-    .info-chip strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    button.info-chip:hover,
-    a.info-chip:hover {
-      border-color: var(--cyan);
-      color: var(--text);
     }
 
     /* Intro Section */
@@ -527,7 +486,8 @@
     }
 
     .video-card:hover .arrow,
-    .short-card:hover .arrow {
+    .short-card:hover .arrow,
+    .link-card:hover .arrow {
       opacity: 1;
       color: var(--cyan);
       transform: translate(1px, -1px);
@@ -640,6 +600,35 @@
       margin-top: 8px;
     }
 
+    /* Links Bar */
+    .link-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 14px;
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+
+    .link-card:hover {
+      border-color: var(--cyan);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .link-sub {
+      font-family: var(--mono);
+      font-size: 0.69rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     /* Footer */
     footer {
       margin-top: 44px;
@@ -727,21 +716,17 @@
       <a id="profileLink" class="profile" href="#" target="_blank" rel="noopener noreferrer">
         <img id="avatarImg" class="gd-avatar" src="KFRasaGD.png" alt="GD Icon" />
         <div class="profile-meta">
-          <div class="name-row">
-            <h1 id="channelName">KFRasa</h1>
-            <span class="gd-pill">gd</span>
-          </div>
+          <h1 id="channelName">KFRasa</h1>
           <p id="channelBio">@KFRasa · just a small gd youtuber</p>
         </div>
       </a>
       <div class="header-actions">
+        <span id="subBadge" class="sub-badge"></span>
         <a id="channelBtn" class="yt-link" href="#" target="_blank" rel="noopener noreferrer">
           youtube ↗
         </a>
       </div>
     </header>
-
-    <div id="infoStrip" class="info-strip" aria-label="Channel Info"></div>
 
     <section class="intro-card" aria-label="Introduction">
       <img id="introGif" class="intro-gif" src="petpet.gif" alt="Petting GD Icon" />
@@ -780,6 +765,16 @@
       <div id="shortsBar" class="bar-grid"></div>
     </section>
 
+    <section class="section" aria-label="Links">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Links</h2>
+        </div>
+        <span class="sync-badge">profiles &amp; chat</span>
+      </div>
+      <div id="linksBar" class="bar-grid"></div>
+    </section>
+
     <footer>
       <span class="foot-brand">
         <img id="footerIcon" src="KFRasaGD.png" alt="" />
@@ -800,10 +795,26 @@
       iconPath: "KFRasaGD.png",
       petGifPath: "petpet.gif",
 
-      // Optional GD chips under header (leave "" to hide any of them)
-      gdAccount: "KFRasa",
-      hardest: "",          // e.g. "Bloodbath" or "Acu"
-      discordUrl: "",       // e.g. "https://discord.gg/yourcode"
+      links: [
+        {
+          tag: "steam",
+          title: "my Steam profile",
+          sub: "steamcommunity.com/id/KFRasa",
+          url: "https://steamcommunity.com/id/KFRasa"
+        },
+        {
+          tag: "group chat",
+          title: "Steam group chat invite!",
+          sub: "join the steam chat",
+          url: "https://steamcommunity.com/chat/invite/GcsWhoGH"
+        },
+        {
+          tag: "gd browser",
+          title: "my GD profile (web)",
+          sub: "gdbrowser.com/u/KFRasa",
+          url: "https://gdbrowser.com/u/KFRasa"
+        }
+      ],
 
       // Fallback data if data.json hasn't loaded
       videos: [
@@ -828,6 +839,17 @@
         maximumFractionDigits: n >= 10000 ? 0 : 1
       }).format(n);
       return `${compact} ${n === 1 ? "view" : "views"}`;
+    }
+
+    function formatSubs(subs) {
+      if (subs === null || subs === undefined || Number.isNaN(Number(subs))) {
+        return null;
+      }
+      const n = Number(subs);
+      const compact = n >= 1000
+        ? new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n)
+        : n.toLocaleString("en");
+      return `${compact} ${n === 1 ? "sub" : "subs"}`;
     }
 
     function timeAgo(isoDate) {
@@ -895,51 +917,7 @@
       return wrap;
     }
 
-    function renderInfoStrip() {
-      const strip = document.getElementById("infoStrip");
-      strip.innerHTML = "";
-
-      if (CHANNEL.gdAccount) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "info-chip";
-        btn.innerHTML = `gd user: <strong></strong>`;
-        btn.querySelector("strong").textContent = CHANNEL.gdAccount;
-        btn.title = "Click to copy GD username";
-        btn.addEventListener("click", async () => {
-          try {
-            await navigator.clipboard.writeText(CHANNEL.gdAccount);
-            btn.querySelector("strong").textContent = "copied!";
-            setTimeout(() => {
-              btn.querySelector("strong").textContent = CHANNEL.gdAccount;
-            }, 1200);
-          } catch {}
-        });
-        strip.appendChild(btn);
-      }
-
-      if (CHANNEL.hardest) {
-        const chip = document.createElement("span");
-        chip.className = "info-chip";
-        chip.innerHTML = `hardest: <strong></strong>`;
-        chip.querySelector("strong").textContent = CHANNEL.hardest;
-        strip.appendChild(chip);
-      }
-
-      if (CHANNEL.discordUrl) {
-        const a = document.createElement("a");
-        a.className = "info-chip";
-        a.href = CHANNEL.discordUrl;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.innerHTML = `discord <strong>↗</strong>`;
-        strip.appendChild(a);
-      }
-
-      strip.style.display = strip.children.length ? "flex" : "none";
-    }
-
-    function render(videos, shorts, updatedAt) {
+    function render(videos, shorts, updatedAt, subscribers) {
       document.title = CHANNEL.name;
       ["favicon", "avatarImg", "heroWatermark", "dividerIcon", "footerIcon"].forEach((id) => {
         const el = document.getElementById(id);
@@ -952,6 +930,15 @@
       document.getElementById("channelBio").textContent = `${CHANNEL.handle} · ${CHANNEL.bio}`;
       document.getElementById("footerText").textContent = CHANNEL.handle;
 
+      const subBadge = document.getElementById("subBadge");
+      const subText = formatSubs(subscribers);
+      if (subText) {
+        subBadge.textContent = subText;
+        subBadge.style.display = "inline-block";
+      } else {
+        subBadge.style.display = "none";
+      }
+
       if (updatedAt) {
         document.getElementById("syncText").textContent = `synced ${timeAgo(updatedAt)}`;
       }
@@ -959,8 +946,6 @@
       ["profileLink", "channelBtn", "footerLink"].forEach((id) => {
         document.getElementById(id).href = CHANNEL.channelUrl;
       });
-
-      renderInfoStrip();
 
       const videosBar = document.getElementById("videosBar");
       videosBar.innerHTML = "";
@@ -1031,6 +1016,30 @@
         a.appendChild(meta);
         shortsBar.appendChild(a);
       });
+
+      const linksBar = document.getElementById("linksBar");
+      linksBar.innerHTML = "";
+      CHANNEL.links.forEach((item, index) => {
+        const a = document.createElement("a");
+        a.className = "link-card";
+        a.href = item.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.innerHTML = `
+          <div class="tag-row">
+            <span class="tag-label">
+              <span class="dot ${index === 1 ? "white" : ""}"></span>
+              ${item.tag}
+            </span>
+            <span class="arrow">↗</span>
+          </div>
+          <div class="card-title"></div>
+          <div class="link-sub"></div>
+        `;
+        a.querySelector(".card-title").textContent = item.title;
+        a.querySelector(".link-sub").textContent = item.sub;
+        linksBar.appendChild(a);
+      });
     }
 
     async function init() {
@@ -1042,10 +1051,11 @@
         render(
           data.videos?.length ? data.videos : CHANNEL.videos,
           data.shorts?.length ? data.shorts : CHANNEL.shorts,
-          data.updatedAt
+          data.updatedAt,
+          data.subscribers
         );
       } catch {
-        render(CHANNEL.videos, CHANNEL.shorts, null);
+        render(CHANNEL.videos, CHANNEL.shorts, null, null);
       }
     }
 
