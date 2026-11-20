@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KFRasa</title>
+  <link id="favicon" rel="icon" type="image/png" href="KFRasaGD.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --surface: #111318;
+      --border: #1e222a;
+      --text: #ededed;
+      --muted: #7b8391;
+      --cyan: #00c8ff;
+      --white: #ffffff;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.45;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 56px 20px 48px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 52px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan) 50%, var(--white) 50%);
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .gd-avatar {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      transition: transform 0.16s ease;
+    }
+
+    .profile:hover .gd-avatar {
+      transform: translateY(-1px);
+    }
+
+    .profile-meta h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .profile-meta p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .yt-link {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 8px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .yt-link:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* Section Bars */
+    .section {
+      margin-top: 36px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+
+    .section-head span {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .bar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    /* Video Cards (16:9) */
+    .video-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .video-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .thumb-16x9 {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0d0f14;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .thumb-16x9 img,
+    .thumb-9x16 img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-fallback {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      background: #0d0f14;
+    }
+
+    .thumb-fallback img {
+      width: 30px;
+      height: 30px;
+      opacity: 0.25;
+      object-fit: contain;
+    }
+
+    .card-body {
+      padding: 11px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .tag-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tag-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 1px;
+      background: var(--cyan);
+    }
+
+    .dot.white {
+      background: var(--white);
+    }
+
+    .arrow {
+      opacity: 0.45;
+      transition: transform 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+    }
+
+    .video-card:hover .arrow,
+    .short-card:hover .arrow {
+      opacity: 1;
+      color: var(--cyan);
+      transform: translate(1px, -1px);
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .views-line {
+      font-family: var(--mono);
+      font-size: 0.69rem;
+      color: var(--muted);
+    }
+
+    /* Mid-page icon divider */
+    .icon-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 34px 0 0;
+    }
+
+    .icon-divider::before,
+    .icon-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: var(--border);
+    }
+
+    .icon-divider img {
+      width: 18px;
+      height: 18px;
+      opacity: 0.75;
+      transition: opacity 0.15s ease;
+    }
+
+    .icon-divider:hover img {
+      opacity: 1;
+    }
+
+    /* Shorts Cards (9:16 compact horizontal split) */
+    .short-card {
+      display: flex;
+      align-items: stretch;
+      gap: 11px;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .short-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .thumb-9x16 {
+      width: 64px;
+      aspect-ratio: 9 / 16;
+      flex-shrink: 0;
+      border-radius: 5px;
+      overflow: hidden;
+      background: #0d0f14;
+      border: 1px solid var(--border);
+    }
+
+    .short-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3px 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .short-meta .card-title {
+      -webkit-line-clamp: 3;
+      font-size: 0.84rem;
+      margin-top: 4px;
+    }
+
+    .short-foot {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .foot-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .foot-brand img {
+      width: 15px;
+      height: 15px;
+    }
+
+    footer a:hover {
+      color: var(--cyan);
+    }
+
+    @media (max-width: 680px) {
+      .wrap {
+        padding: 32px 16px 36px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .bar-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thumb-9x16 {
+        width: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <a id="profileLink" class="profile" href="#" target="_blank" rel="noopener noreferrer">
+        <img id="avatarImg" class="gd-avatar" src="KFRasaGD.png" alt="GD Icon" />
+        <div class="profile-meta">
+          <h1 id="channelName">KFRasa</h1>
+          <p id="channelBio">@KFRasa · just a small gd youtuber</p>
+        </div>
+      </a>
+      <a id="channelBtn" class="yt-link" href="#" target="_blank" rel="noopener noreferrer">
+        youtube ↗
+      </a>
+    </header>
+
+    <section class="section" aria-label="Videos">
+      <div class="section-head">
+        <h2>Videos</h2>
+        <span id="videosUpdated">direct links</span>
+      </div>
+      <div id="videosBar" class="bar-grid"></div>
+    </section>
+
+    <div class="icon-divider" aria-hidden="true">
+      <img id="dividerIcon" src="KFRasaGD.png" alt="" />
+    </div>
+
+    <section class="section" aria-label="Shorts">
+      <div class="section-head">
+        <h2>Shorts</h2>
+        <span>direct links</span>
+      </div>
+      <div id="shortsBar" class="bar-grid"></div>
+    </section>
+
+    <footer>
+      <span class="foot-brand">
+        <img id="footerIcon" src="KFRasaGD.png" alt="" />
+        <span id="footerText">@KFRasa</span>
+      </span>
+      <a id="footerLink" href="#" target="_blank" rel="noopener noreferrer">subscribe ↗</a>
+    </footer>
+  </main>
+
+  <script>
+    const CHANNEL = {
+      name: "KFRasa",
+      handle: "@KFRasa",
+      bio: "just a small gd youtuber",
+      channelUrl: "https://www.youtube.com/@KFRasa",
+      iconPath: "KFRasaGD.png",
+
+      // Fallback data if data.json hasn't been generated yet
+      videos: [
+        { label: "most recent", title: "Latest Upload", url: "", views: null },
+        { label: "most popular", title: "Most Popular Upload", url: "", views: null },
+        { label: "first video", title: "First Upload", url: "", views: null }
+      ],
+      shorts: [
+        { label: "most recent", title: "Latest Short", url: "", views: null },
+        { label: "most popular", title: "Most Popular Short", url: "", views: null },
+        { label: "first short", title: "First Short", url: "", views: null }
+      ]
+    };
+
+    function formatViews(views) {
+      if (views === null || views === undefined || Number.isNaN(Number(views))) {
+        return "watch";
+      }
+      const n = Number(views);
+      const compact = new Intl.NumberFormat("en", {
+        notation: "compact",
+        maximumFractionDigits: n >= 10000 ? 0 : 1
+      }).format(n);
+      return `${compact} ${n === 1 ? "view" : "views"}`;
+    }
+
+    function extractYouTubeId(input) {
+      if (!input) return null;
+      const trimmed = input.trim();
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+      const match = trimmed.match(
+        /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+      );
+      return match ? match[1] : null;
+    }
+
+    function createThumbnail(id, isShort) {
+      const wrap = document.createElement("div");
+      wrap.className = isShort ? "thumb-9x16" : "thumb-16x9";
+
+      const showFallback = () => {
+        wrap.innerHTML = `<div class="thumb-fallback"><img src="${CHANNEL.iconPath}" alt="" /></div>`;
+      };
+
+      if (!id) {
+        showFallback();
+        return wrap;
+      }
+
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = "";
+      const maxRes = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+      const mqRes = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+
+      img.src = maxRes;
+      img.onload = () => {
+        if (img.naturalWidth === 120 && img.src !== mqRes) {
+          img.src = mqRes;
+        }
+      };
+      img.onerror = () => {
+        if (img.src !== mqRes) {
+          img.src = mqRes;
+        } else {
+          showFallback();
+        }
+      };
+
+      wrap.appendChild(img);
+      return wrap;
+    }
+
+    function render(videos, shorts, updatedAt) {
+      document.title = CHANNEL.name;
+      document.getElementById("favicon").href = CHANNEL.iconPath;
+      document.getElementById("avatarImg").src = CHANNEL.iconPath;
+      document.getElementById("dividerIcon").src = CHANNEL.iconPath;
+      document.getElementById("footerIcon").src = CHANNEL.iconPath;
+
+      document.getElementById("channelName").textContent = CHANNEL.name;
+      document.getElementById("channelBio").textContent = `${CHANNEL.handle} · ${CHANNEL.bio}`;
+      document.getElementById("footerText").textContent = CHANNEL.handle;
+
+      if (updatedAt) {
+        const d = new Date(updatedAt);
+        if (!Number.isNaN(d.getTime())) {
+          document.getElementById("videosUpdated").textContent =
+            `synced ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+        }
+      }
+
+      ["profileLink", "channelBtn", "footerLink"].forEach((id) => {
+        document.getElementById(id).href = CHANNEL.channelUrl;
+      });
+
+      const videosBar = document.getElementById("videosBar");
+      videosBar.innerHTML = "";
+      videos.forEach((item, index) => {
+        const ytId = item.id || extractYouTubeId(item.url);
+        const href = ytId ? `https://www.youtube.com/watch?v=${ytId}` : CHANNEL.channelUrl;
+
+        const a = document.createElement("a");
+        a.className = "video-card";
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        a.appendChild(createThumbnail(ytId, false));
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+        body.innerHTML = `
+          <div class="card-top">
+            <div class="tag-row">
+              <span class="tag-label">
+                <span class="dot ${index === 1 ? "white" : ""}"></span>
+                ${item.label}
+              </span>
+              <span class="arrow">↗</span>
+            </div>
+            <div class="card-title"></div>
+          </div>
+          <div class="views-line"></div>
+        `;
+        body.querySelector(".card-title").textContent = item.title || "No video yet";
+        body.querySelector(".views-line").textContent = ytId ? formatViews(item.views) : "—";
+        a.appendChild(body);
+        videosBar.appendChild(a);
+      });
+
+      const shortsBar = document.getElementById("shortsBar");
+      shortsBar.innerHTML = "";
+      shorts.forEach((item, index) => {
+        const ytId = item.id || extractYouTubeId(item.url);
+        const href = ytId ? `https://www.youtube.com/shorts/${ytId}` : CHANNEL.channelUrl;
+
+        const a = document.createElement("a");
+        a.className = "short-card";
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        a.appendChild(createThumbnail(ytId, true));
+
+        const meta = document.createElement("div");
+        meta.className = "short-meta";
+        meta.innerHTML = `
+          <div>
+            <div class="tag-row">
+              <span class="tag-label">
+                <span class="dot ${index === 1 ? "white" : ""}"></span>
+                ${item.label}
+              </span>
+            </div>
+            <div class="card-title"></div>
+          </div>
+          <div class="short-foot">
+            <span class="views-text"></span>
+            <span class="arrow">↗</span>
+          </div>
+        `;
+        meta.querySelector(".card-title").textContent = item.title || "No short yet";
+        meta.querySelector(".views-text").textContent = ytId ? formatViews(item.views) : "—";
+        a.appendChild(meta);
+        shortsBar.appendChild(a);
+      });
+    }
+
+    async function init() {
+      try {
+        const cacheBust = Math.floor(Date.now() / 60000);
+        const res = await fetch(`data.json?v=${cacheBust}`);
+        if (!res.ok) throw new Error("No data.json yet");
+        const data = await res.json();
+        render(
+          data.videos?.length ? data.videos : CHANNEL.videos,
+          data.shorts?.length ? data.shorts : CHANNEL.shorts,
+          data.updatedAt
+        );
+      } catch {
+        render(CHANNEL.videos, CHANNEL.shorts, null);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
