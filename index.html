@@ -267,9 +267,77 @@
       transform: translateY(-1px);
     }
 
+    /* GD Stats Bar (above Introduction) */
+    .gd-stats-bar {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+
+    .gd-stats-bar:hover {
+      border-color: var(--cyan);
+      background: var(--surface-hover);
+      transform: translateY(-1px);
+    }
+
+    .gd-stats-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 18px;
+    }
+
+    .gd-stat-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+    }
+
+    .gd-stat-icon {
+      width: 21px;
+      height: 21px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .gd-stat-val {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .gd-stat-label {
+      font-size: 0.67rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .gd-stats-arrow {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-left: auto;
+      transition: color 0.15s ease;
+    }
+
+    .gd-stats-bar:hover .gd-stats-arrow {
+      color: var(--cyan);
+    }
+
     /* Intro Section */
     .intro-card {
-      margin-top: 22px;
+      margin-top: 16px;
       background: var(--surface);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border);
@@ -728,6 +796,11 @@
       </div>
     </header>
 
+    <a id="gdStatsBar" class="gd-stats-bar" href="https://gdbrowser.com/u/KFRasa" target="_blank" rel="noopener noreferrer" aria-label="Geometry Dash Stats">
+      <div id="gdStatsList" class="gd-stats-list"></div>
+      <span class="gd-stats-arrow">gdbrowser ↗</span>
+    </a>
+
     <section class="intro-card" aria-label="Introduction">
       <img id="introGif" class="intro-gif" src="petpet.gif" alt="Petting GD Icon" />
       <div class="intro-text">
@@ -792,6 +865,7 @@
       handle: "@KFRasa",
       bio: "just a small gd youtuber",
       channelUrl: "https://www.youtube.com/@KFRasa",
+      gdProfileUrl: "https://gdbrowser.com/u/KFRasa",
       iconPath: "KFRasaGD.png",
       petGifPath: "petpet.gif",
 
@@ -828,6 +902,16 @@
         { label: "first short", title: "First Short", url: "", views: null }
       ]
     };
+
+    const GD_ASSETS = [
+      { key: "stars", label: "stars", img: "https://gdbrowser.com/assets/star.png" },
+      { key: "moons", label: "moons", img: "https://gdbrowser.com/assets/moon.png" },
+      { key: "diamonds", label: "diamonds", img: "https://gdbrowser.com/assets/diamond.png" },
+      { key: "coins", label: "coins", img: "https://gdbrowser.com/assets/coin.png" },
+      { key: "userCoins", label: "user coins", img: "https://gdbrowser.com/assets/silvercoin.png" },
+      { key: "demons", label: "demons", img: "https://gdbrowser.com/assets/demon.png", fallbackImg: "https://gdbrowser.com/assets/gdfaces/demon.png" },
+      { key: "cp", label: "cp", img: "https://gdbrowser.com/assets/cp.png", hideIfZero: true }
+    ];
 
     function formatViews(views) {
       if (views === null || views === undefined || Number.isNaN(Number(views))) {
@@ -917,7 +1001,49 @@
       return wrap;
     }
 
-    function render(videos, shorts, updatedAt, subscribers) {
+    function renderGdStats(gd) {
+      const bar = document.getElementById("gdStatsBar");
+      const list = document.getElementById("gdStatsList");
+      bar.href = CHANNEL.gdProfileUrl;
+      list.innerHTML = "";
+
+      GD_ASSETS.forEach((stat) => {
+        const raw = gd?.[stat.key];
+        const val = raw !== undefined && raw !== null ? Number(raw) : null;
+        if (stat.hideIfZero && (!val || val === 0)) return;
+
+        const item = document.createElement("div");
+        item.className = "gd-stat-item";
+        item.title = stat.label;
+
+        const img = document.createElement("img");
+        img.className = "gd-stat-icon";
+        img.src = stat.img;
+        img.alt = stat.label;
+        img.onerror = () => {
+          if (stat.fallbackImg && img.src !== stat.fallbackImg) {
+            img.src = stat.fallbackImg;
+          } else {
+            img.style.display = "none";
+          }
+        };
+
+        const valEl = document.createElement("span");
+        valEl.className = "gd-stat-val";
+        valEl.textContent = val !== null && !Number.isNaN(val) ? val.toLocaleString("en") : "—";
+
+        const labelEl = document.createElement("span");
+        labelEl.className = "gd-stat-label";
+        labelEl.textContent = stat.label;
+
+        item.appendChild(img);
+        item.appendChild(valEl);
+        item.appendChild(labelEl);
+        list.appendChild(item);
+      });
+    }
+
+    function render(videos, shorts, updatedAt, subscribers, gd) {
       document.title = CHANNEL.name;
       ["favicon", "avatarImg", "heroWatermark", "dividerIcon", "footerIcon"].forEach((id) => {
         const el = document.getElementById(id);
@@ -946,6 +1072,8 @@
       ["profileLink", "channelBtn", "footerLink"].forEach((id) => {
         document.getElementById(id).href = CHANNEL.channelUrl;
       });
+
+      renderGdStats(gd);
 
       const videosBar = document.getElementById("videosBar");
       videosBar.innerHTML = "";
@@ -1052,10 +1180,11 @@
           data.videos?.length ? data.videos : CHANNEL.videos,
           data.shorts?.length ? data.shorts : CHANNEL.shorts,
           data.updatedAt,
-          data.subscribers
+          data.subscribers,
+          data.gd
         );
       } catch {
-        render(CHANNEL.videos, CHANNEL.shorts, null, null);
+        render(CHANNEL.videos, CHANNEL.shorts, null, null, null);
       }
     }
 
